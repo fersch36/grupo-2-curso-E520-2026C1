@@ -2,8 +2,17 @@
 # Librerías ---------------------------------------------------------------
 
 #install.packages("eph")
+#install.packages("openxlsx")
 # Cargo la libreria
+
+
 library(eph)
+library(tidygraph)
+library(tidyverse)
+library(ggraph)
+library(ggplot2)
+library(openxlsx)
+
 
 base_individual <- get_microdata(
   year = 2018:2019, # especifco el año
