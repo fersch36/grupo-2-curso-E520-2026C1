@@ -2,7 +2,7 @@
 ## TRABAJO FINAL - DINÁMICA SALARIAL INTERSECTORIAL (EPH)
 ## Script: 3_explorar_muestra.R
 ## Input:  data/muestra_eph.csv
-## Output: gráficos en plots/ (o directamente en pantalla)
+## Output: gráficos en plots/ + tablas de diagnóstico en consola
 ## ============================================================
 
 library(tidyverse)
@@ -20,7 +20,7 @@ RUTA_MUESTRA <- here("data", "muestra_eph.csv")
 
 # ¿Guardar los gráficos como PNG en plots/?
 # Cambiar a TRUE para activar — se crea la carpeta automáticamente si no existe
-GUARDAR_PLOTS <- TRUE
+GUARDAR_PLOTS <- FALSE
 CARPETA_PLOTS <- here("plots")
 ANCHO  <- 10    # pulgadas
 ALTO   <- 6     # pulgadas
@@ -57,6 +57,9 @@ df <- raw %>%
     str_detect(CAT_OCUP, regex("Obrero",  ignore_case = TRUE))
   ) %>%
   mutate(
+    Anio      = as.integer(Anio),
+    Trimestre = as.integer(Trimestre),
+
     Sector = clasificar_sector(caes_division_cod),
 
     Genero = case_when(
@@ -105,31 +108,121 @@ df <- raw %>%
   filter(!is.na(Ingreso), Ingreso > 0)
 
 cat(glue(
-  "✅ Muestra cargada: {nrow(df)} asalariados ocupados | ",
+  "✅ Muestra lista: {nrow(df)} asalariados ocupados | ",
   "{n_distinct(df$Anio)} años | ",
-  "{n_distinct(interaction(df$Anio, df$Trimestre))} trimestres\n"
+  "{n_distinct(interaction(df$Anio, df$Trimestre))} trimestres\n\n"
 ))
 
 
 # -------------------------------------------------------
-# 2. RESUMEN POR SECTOR
+# 2. TABLAS DE DIAGNÓSTICO
 # -------------------------------------------------------
+# Esta sección está pensada para pegar en el chat y analizar.
+# Los números son nominales — la transformación a CBT va en 4_analisis_cbt.R
 
+RUTA_DIAGNOSTICO <- here("data", "diagnostico_muestra.txt")
+options(width = 200)
+sink(RUTA_DIAGNOSTICO)
+
+cat("=======================================================\n")
+cat("DIAGNÓSTICO — DISTRIBUCIONES CLAVE\n")
+cat("=======================================================\n")
+
+cat("\n--- Filas por año (¿cubre toda la serie?) ---\n")
+print(table(df$Anio))
+
+cat("\n--- Distribución sectorial ---\n")
+print(sort(table(df$Sector), decreasing = TRUE))
+
+cat("\n--- NAs por variable clave ---\n")
+vars_clave <- c("Sector", "Genero", "Registro", "Tramo_Edad", "Nivel_Ed", "Region", "Ingreso")
+na_tabla <- df %>%
+  summarise(across(all_of(vars_clave), ~sum(is.na(.)))) %>%
+  pivot_longer(everything(), names_to = "Variable", values_to = "NAs") %>%
+  mutate(Pct_NA = round(NAs / nrow(df) * 100, 1)) %>%
+  arrange(desc(NAs))
+print(na_tabla)
+
+cat("\n--- Resumen por sector (ingreso nominal) ---\n")
 resumen_sector <- df %>%
   filter(!is.na(Sector), !is.na(Registro)) %>%
   group_by(Sector) %>%
   summarise(
     N             = n(),
-    Ingreso_Medio = weighted.mean(Ingreso, PONDERA, na.rm = TRUE),
-    Pct_NR        = mean(Registro == "No Registrado", na.rm = TRUE) * 100,
-    Edad_Media    = mean(Edad, na.rm = TRUE),
-    Pct_Mujer     = mean(Genero == "Mujer", na.rm = TRUE) * 100,
+    Ingreso_Medio = round(weighted.mean(Ingreso, PONDERA, na.rm = TRUE)),
+    Ingreso_Median= round(median(Ingreso, na.rm = TRUE)),
+    Pct_NR        = round(mean(Registro == "No Registrado", na.rm = TRUE) * 100, 1),
+    Edad_Media    = round(mean(Edad, na.rm = TRUE), 1),
+    Pct_Mujer     = round(mean(Genero == "Mujer", na.rm = TRUE) * 100, 1),
     .groups = "drop"
   ) %>%
   arrange(desc(Ingreso_Medio))
-
-cat("\n--- Resumen por sector ---\n")
 print(resumen_sector)
+
+cat("\n--- Ingreso por sector y año (mediana nominal) ---\n")
+print(
+  df %>%
+    filter(!is.na(Sector)) %>%
+    group_by(Anio, Sector) %>%
+    summarise(Ingreso_Median = round(median(Ingreso, na.rm = TRUE)), .groups = "drop") %>%
+    pivot_wider(names_from = Anio, values_from = Ingreso_Median),
+  n = Inf
+)
+
+cat("\n--- Informalidad por sector y género ---\n")
+print(
+  df %>%
+    filter(!is.na(Registro), !is.na(Genero), !is.na(Sector)) %>%
+    group_by(Sector, Genero) %>%
+    summarise(Pct_NR = round(mean(Registro == "No Registrado") * 100, 1), .groups = "drop") %>%
+    pivot_wider(names_from = Genero, values_from = Pct_NR),
+  n = Inf
+)
+
+cat("\n--- Distribución por región y sector ---\n")
+print(
+  df %>%
+    filter(!is.na(Region), !is.na(Sector)) %>%
+    count(Region, Sector) %>%
+    pivot_wider(names_from = Sector, values_from = n, values_fill = 0),
+  n = Inf
+)
+
+cat("\n--- Nivel educativo por sector (%) ---\n")
+print(
+  df %>%
+    filter(!is.na(Nivel_Ed), !is.na(Sector), Nivel_Ed != "Otro / NS") %>%
+    count(Sector, Nivel_Ed) %>%
+    group_by(Sector) %>%
+    mutate(Pct = round(n / sum(n) * 100, 1)) %>%
+    select(-n) %>%
+    pivot_wider(names_from = Nivel_Ed, values_from = Pct, values_fill = 0),
+  n = Inf
+)
+
+cat("\n--- Personas con 2+ observaciones (candidatos a traspaso) ---\n")
+panel_ids <- df %>%
+  count(CODUSU, NRO_HOGAR, COMPONENTE) %>%
+  filter(n >= 2)
+cat(glue("Personas únicas con 2+ apariciones: {nrow(panel_ids)}\n\n"))
+
+traspasos_muestra <- df %>%
+  semi_join(panel_ids, by = c("CODUSU", "NRO_HOGAR", "COMPONENTE")) %>%
+  arrange(CODUSU, NRO_HOGAR, COMPONENTE, Anio, Trimestre) %>%
+  group_by(CODUSU, NRO_HOGAR, COMPONENTE) %>%
+  mutate(Sector_prev = lag(Sector)) %>%
+  ungroup() %>%
+  filter(!is.na(Sector_prev), Sector != Sector_prev)
+
+cat(glue("Traspasos detectados en la muestra: {nrow(traspasos_muestra)}\n\n"))
+
+cat("--- Top flujos de traspaso ---\n")
+print(
+  traspasos_muestra %>%
+    count(Sector_prev, Sector, name = "N") %>%
+    arrange(desc(N)) %>%
+    head(15)
+)
 
 
 # -------------------------------------------------------
@@ -151,9 +244,9 @@ g1 <- resumen_sector %>%
     expand = expansion(mult = c(0, 0.25))
   ) +
   labs(
-    title    = "Ingreso mensual medio por sector",
+    title    = "Ingreso mensual medio por sector (nominal)",
     subtitle = "Asalariados ocupados — promedio ponderado (PONDERA)",
-    caption  = "Fuente: muestra EPH 2T2016–4T2025",
+    caption  = "Fuente: muestra EPH 2T2016–4T2025. Valores nominales, no comparables entre años.",
     x = NULL, y = NULL
   )
 
@@ -179,7 +272,7 @@ g2 <- resumen_sector %>%
   ) +
   labs(
     title    = "Tasa de informalidad por sector",
-    subtitle = "% de trabajadores no registrados (sin recibo de sueldo)",
+    subtitle = "% de trabajadores no registrados (sin descuento jubilatorio)",
     caption  = "Fuente: muestra EPH 2T2016–4T2025",
     x = NULL, y = NULL
   )
@@ -266,9 +359,9 @@ g5 <- df %>%
   scale_fill_manual(values = colores_sectores) +
   scale_x_log10(labels = label_dollar(prefix = "$", big.mark = ".", decimal.mark = ",")) +
   labs(
-    title    = "Distribución del ingreso por sector (escala log)",
+    title    = "Distribución del ingreso por sector (escala log, nominal)",
     subtitle = "Mediana, rango intercuartil y outliers",
-    caption  = "Fuente: muestra EPH 2T2016–4T2025",
+    caption  = "Fuente: muestra EPH 2T2016–4T2025. Valores nominales, no comparables entre años.",
     x = NULL, y = NULL
   )
 
@@ -299,15 +392,7 @@ guardar(g6, "06_informalidad_genero_sector")
 
 
 ## G7: Flujos de traspaso detectados ---------------------------------------------
-panel <- df %>%
-  select(CODUSU, NRO_HOGAR, COMPONENTE, Anio, Trimestre, Sector, Ingreso, Genero) %>%
-  arrange(CODUSU, NRO_HOGAR, COMPONENTE, Anio, Trimestre) %>%
-  group_by(CODUSU, NRO_HOGAR, COMPONENTE) %>%
-  mutate(Sector_prev = lag(Sector)) %>%
-  ungroup() %>%
-  filter(!is.na(Sector_prev), Sector != Sector_prev)
-
-flujos <- panel %>%
+flujos <- traspasos_muestra %>%
   count(Sector_prev, Sector, name = "Traspasos") %>%
   filter(Traspasos >= 3) %>%
   arrange(desc(Traspasos)) %>%
@@ -328,7 +413,7 @@ g7 <- flujos %>%
   labs(
     title    = "Principales flujos de traspaso sectorial detectados",
     subtitle = glue(
-      "{nrow(panel)} traspasos en {n_distinct(panel$CODUSU)} personas ",
+      "{nrow(traspasos_muestra)} traspasos en {n_distinct(traspasos_muestra$CODUSU)} personas ",
       "(muestra EPH — panel rotante)"
     ),
     caption  = "Fuente: muestra EPH 2T2016–4T2025. Solo flujos con ≥3 casos.",
@@ -383,9 +468,9 @@ g9 <- df %>%
   scale_shape_manual(values = c("16-25" = 17, "26-46" = 16, "47+" = 15)) +
   scale_x_continuous(labels = label_dollar(prefix = "$", big.mark = ".", decimal.mark = ",")) +
   labs(
-    title    = "Ingreso medio por sector, género y tramo etario",
+    title    = "Ingreso medio por sector, género y tramo etario (nominal)",
     subtitle = "Cada punto = combinación sector × género × tramo",
-    caption  = "Fuente: muestra EPH 2T2016–4T2025",
+    caption  = "Fuente: muestra EPH 2T2016–4T2025. Valores nominales, no comparables entre años.",
     x = NULL, y = NULL,
     color = "Género", shape = "Tramo etario"
   )
@@ -406,4 +491,6 @@ if (pct_otros > 20) {
   ))
 }
 
+sink()
+cat(glue("\n✅ Diagnóstico guardado en {RUTA_DIAGNOSTICO}\n"))
 cat("\n✅ Análisis exploratorio completado.\n")
