@@ -75,3 +75,10 @@ Administración Pública tiene la brecha más baja, consistente con el rol igual
 ---
 
 *Documento en construcción — se actualiza a medida que avanza el análisis.*
+
+Lo más importante: el balance general es casi neutro — 7.072 empeoraron vs 6.774 mejoraron. Cambiar de sector no garantiza mejorar. La mediana del Delta CBT es -0.01, prácticamente cero.
+El hallazgo más fuerte: los que parten de Servicio Doméstico casi siempre mejoran — 70.8% de mejora con un Delta CBT medio de +0.54. Es el sector del que más conviene salir. El flujo Servicio Doméstico → Administración Pública tiene Delta CBT de +1.33 canastas con 87% de mejora.
+Dato llamativo sobre registro: los no registrados que cambian de sector mejoran más (54.2%) que los registrados (46%). Eso tiene sentido — los no registrados tienen más margen para mejorar.
+Los traspasos de 2020–2022 se disparan — 919, 2.219 y 2.538 vs ~350 en años anteriores. Probablemente el ASPO destruyó empleos y forzó reconversiones masivas.
+Servicio Doméstico como destino es el peor resultado posible — Delta CBT de -0.607 con solo 24.8% de mejora. ---> esta info es temporaria, despues la cambiamos
+
