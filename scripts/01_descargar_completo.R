@@ -229,5 +229,5 @@ View(base_completa_eph)
 ## 7. GUARDADO FINAL
 ## ============================================================
 
-write_csv(base_completa_eph, "data/base_completa_eph_etiquetada.csv")
-message("✅ Guardada en data/base_completa_eph_etiquetada.csv")
+saveRDS(base_completa_eph, here("data", "base_completa_eph_etiquetada.rds"))
+message("✅ Guardada en data/babase_completa_eph_etiquetada.rds")

@@ -20,8 +20,8 @@ RUTA_MUESTRA <- here("data", "muestra_eph.csv")
 
 # ¿Guardar los gráficos como PNG en plots/?
 # Cambiar a TRUE para activar — se crea la carpeta automáticamente si no existe
-GUARDAR_PLOTS <- FALSE
-CARPETA_PLOTS <- here("plots")
+GUARDAR_PLOTS <- TRUE
+CARPETA_PLOTS <- here("plots", "03_muestra")
 ANCHO  <- 10    # pulgadas
 ALTO   <- 6     # pulgadas
 DPI    <- 150
