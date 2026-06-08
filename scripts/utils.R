@@ -70,6 +70,7 @@ colores_sectores <- c(
   "Administración Pública"        = "#534AB7",
   "Transporte y Almacenamiento"   = "#73726c",
   "Minería, Energía y Agro"       = "#3C3489",
+  "Servicios Profesionales e IT"  = "#F4A261",
   "Otros Servicios / Actividades" = "#B4B2A9"
 )
 

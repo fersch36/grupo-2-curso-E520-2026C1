@@ -112,5 +112,30 @@ De las 252 variables del cuestionario individual de la EPH, se retienen 15 que r
 
 - **CBT regional vs nacional:** incorporar coeficientes regionales para mejorar comparabilidad entre regiones.
 - **Grupo de comparación (contrafactual):** definir contra qué se compara el Delta CBT del trabajador que se traspasó — la opción preferida es el trabajador de igual perfil (género, tramo etario, nivel educativo, región) que se mantuvo en el sector de origen.
-- **Categoría "Servicios Profesionales e IT":** pendiente de validación con el grupo antes de fijarla en el clasificador definitivo.
 - **Factores vs character:** evaluar si conviene convertir variables categóricas con orden natural (`Tramo_Edad`, `Nivel_Ed`) a factor ordenado.
+
+---
+
+## 9. Diseño del grafo intersectorial (`06_grafo.R`)
+
+**Decisiones de representación:**
+
+| Elemento visual | Variable codificada | Justificación |
+|---|---|---|
+| Dirección de la flecha | Sentido del traspaso (origen → destino) | Permite leer asimetría de los flujos |
+| Grosor de arista | N de traspasos (rescalado 0.3–3.5) | Volumen = relevancia empírica del flujo |
+| Color de arista | Delta CBT medio (divergente rojo–blanco–verde, centrado en 0) | Variable central del análisis |
+| Tamaño de nodo | N total de traspasos que involucran al sector (entrada + salida) | Centralidad en la red de movilidad, no empleo total |
+| Color de nodo | Paleta de proyecto (`colores_sectores` en `utils.R`) | Consistencia visual con el resto del proyecto |
+
+**Umbral de flujo:** se incluyen solo flujos con N ≥ 50 en el grafo de red. Flujos con N < 50 tienen estimaciones de Delta CBT poco estables. El heatmap complementario usa N ≥ 30 para mostrar más flujos en formato tabular.
+
+**Layout:** `"stress"` (Fruchterman-Reingold mejorado de `{graphlayouts}`) con `set.seed(42)` para reproducibilidad.
+
+**`geom_edge_arc()`** con `strength = 0.25` para separar visualmente flujos bidireccionales (ej. Adm. Pública ↔ Otros Servicios, que son los flujos más voluminosos).
+
+**Cuatro visualizaciones producidas:**
+- `06_01_grafo_completo.png` — todos los flujos con N ≥ 50
+- `06_02_grafo_ganancia.png` — solo flujos con Delta CBT > 0
+- `06_03_grafo_perdida.png` — solo flujos con Delta CBT ≤ 0
+- `06_04_heatmap_flujos.png` — heatmap de todos los flujos con N ≥ 30 (complemento tabular)

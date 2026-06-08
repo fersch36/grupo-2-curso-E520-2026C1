@@ -54,8 +54,8 @@ Para cada trabajador que realizó un traspaso, comparar su Delta CBT contra el t
 | `02_crear_muestra.R` | Genera muestra para exploración rápida | ✅ Listo |
 | `03_explorar_muestra.R` | Análisis exploratorio descriptivo | ✅ Listo |
 | `04_analisis_cbt.R` | Análisis en canastas básicas (CBT) | ✅ Listo |
-| `05_traspasos.R` | Detección de traspasos y Delta CBT | 🔲 Pendiente |
-| `06_grafo.R` | Visualización del grafo intersectorial | 🔲 Pendiente |
+| `05_traspasos.R` | Detección de traspasos y Delta CBT | ✅ Listo |
+| `06_grafo.R` | Visualización del grafo intersectorial | ✅ Listo |
 | `utils.R` | Funciones compartidas (clasificador, paletas, tema) | ✅ Listo |
 
 ---
@@ -77,4 +77,3 @@ Para cada trabajador que realizó un traspaso, comparar su Delta CBT contra el t
 - **CBT:** se usa la nacional promediada por trimestre (v1). Mejora futura: CBT regional
 - **Clasificador sectorial:** centralizado en `utils.R → clasificar_sector()` — no duplicar
 - **Seguimiento longitudinal:** requiere triple clave `CODUSU + NRO_HOGAR + COMPONENTE`
-- **Categoría "Servicios Profesionales e IT":** pendiente validación con el grupo
