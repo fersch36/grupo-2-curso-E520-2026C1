@@ -74,11 +74,56 @@ Administración Pública tiene la brecha más baja, consistente con el rol igual
 
 ---
 
+## 6. Cambiar de sector no garantiza mejorar — el balance es casi neutro
+
+De los 13.846 traspasos detectados, 7.072 empeoraron su poder adquisitivo y 6.774 mejoraron. La mediana del Delta CBT es -0.01 — prácticamente cero. Cambiar de sector es una apuesta, no una estrategia segura de mejora salarial.
+
+**Implicancia:** el resultado del traspaso depende fuertemente del sector de origen y destino, no del hecho de moverse en sí.
+
+---
+
+## 7. Servicio Doméstico: el sector del que más conviene salir
+
+Los trabajadores que parten de Servicio Doméstico mejoran en el 70.8% de los casos, con un Delta CBT medio de +0.54 canastas. Es el sector con el mejor resultado al salir — consistente con el hallazgo 2 de que es el sector de mayor vulnerabilidad.
+
+**Flujos más beneficiosos desde Servicio Doméstico:**
+
+| Destino | Delta CBT | % que mejoró |
+|---|---|---|
+| Administración Pública | +1.33 | 87% |
+| Educación y Salud | +0.75 | 80.6% |
+| Comercio | +0.37 | 68.7% |
+
+---
+
+## 8. Servicio Doméstico como destino: el peor resultado posible
+
+El flujo inverso — llegar a Servicio Doméstico — tiene un Delta CBT medio de -0.607 con solo 24.8% de mejora. Es el peor sector de destino por amplio margen. Los flujos Administración Pública → Servicio Doméstico (-1.10 CBT, 12.3% de mejora) y Educación y Salud → Servicio Doméstico (-0.963 CBT, 23% de mejora) son los más perjudiciales detectados.
+
+---
+
+## 9. Los no registrados se benefician más al cambiar de sector
+
+Los trabajadores no registrados que realizan un traspaso mejoran en el 54.2% de los casos (Delta CBT medio: +0.18), mientras que los registrados mejoran solo en el 46% (Delta CBT medio: -0.08).
+
+**Explicación:** los trabajadores no registrados parten de una base más baja, lo que les da más margen de mejora relativa. Además, muchos traspasos implican formalización simultánea — 968 de los 13.846 traspasos (7%) vinieron acompañados de un paso de no registrado a registrado.
+
+---
+
+## 10. El ASPO (2020) disparó los traspasos
+
+Los traspasos se multiplicaron abruptamente a partir de 2020:
+
+| Año | Traspasos |
+|---|---|
+| 2016–2019 | ~330 por año |
+| 2020 | 919 |
+| 2021 | 2.219 |
+| 2022 | 2.538 |
+| 2023 | 2.769 |
+
+La destrucción de empleo durante la pandemia forzó reconversiones sectoriales masivas. Este quiebre estructural en la serie debe tenerse en cuenta al interpretar los resultados agregados — los patrones pre y post 2020 pueden ser cualitativamente distintos.
+
+---
+
 *Documento en construcción — se actualiza a medida que avanza el análisis.*
-
-Lo más importante: el balance general es casi neutro — 7.072 empeoraron vs 6.774 mejoraron. Cambiar de sector no garantiza mejorar. La mediana del Delta CBT es -0.01, prácticamente cero.
-El hallazgo más fuerte: los que parten de Servicio Doméstico casi siempre mejoran — 70.8% de mejora con un Delta CBT medio de +0.54. Es el sector del que más conviene salir. El flujo Servicio Doméstico → Administración Pública tiene Delta CBT de +1.33 canastas con 87% de mejora.
-Dato llamativo sobre registro: los no registrados que cambian de sector mejoran más (54.2%) que los registrados (46%). Eso tiene sentido — los no registrados tienen más margen para mejorar.
-Los traspasos de 2020–2022 se disparan — 919, 2.219 y 2.538 vs ~350 en años anteriores. Probablemente el ASPO destruyó empleos y forzó reconversiones masivas.
-Servicio Doméstico como destino es el peor resultado posible — Delta CBT de -0.607 con solo 24.8% de mejora. ---> esta info es temporaria, despues la cambiamos
-
