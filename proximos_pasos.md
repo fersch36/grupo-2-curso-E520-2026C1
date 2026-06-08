@@ -5,40 +5,55 @@
 
 ## Prioridad alta — desbloquean el análisis central
 
-### 1. Validar categoría "Servicios Profesionales e IT" con el grupo
-Decidimos separar IT/Finanzas/Servicios profesionales de "Otros Servicios" porque distorsionaban el ingreso medio de esa categoría residual. Hay que compartir la decisión con el grupo antes de fijarla definitivamente en `utils.R`.
+<<<<<<< HEAD
+### 1. Armar la presentación (15 minutos, director de investigación)
+El producto final del proyecto es una presentación de 15 minutos frente al director del departamento de investigación. Hay que definir la estructura de slides, seleccionar los hallazgos y gráficos más relevantes, y ensayar el tiempo.
 
 ### 2. Definir la metodología del contrafactual
+=======
+### 1. Definir la metodología del contrafactual
+>>>>>>> b6ff66ce096da327009c66d7d743db7a93dd9738
 Para cada traspaso detectado, ¿contra qué comparamos el Delta CBT? La opción preferida es: trabajador de igual género, tramo etario, nivel educativo y región que se mantuvo en el sector de origen. Hay que definirlo operacionalmente y documentarlo en `decisiones_metodologicas.md`.
-
-### 3. Armar `05_traspasos.R`
-Script que detecta traspasos entre trimestres consecutivos usando `CODUSU + NRO_HOGAR + COMPONENTE`, calcula Delta CBT para cada traspaso, e incorpora el grupo de comparación contrafactual. Output: `data/processed/tabla_traspasos.rds`.
 
 ---
 
 ## Prioridad media — mejoran la calidad del análisis
 
-### 4. Incorporar CBT regional
+<<<<<<< HEAD
+### 3. Incorporar CBT regional
 Actualmente se usa la CBT nacional promediada por trimestre. INDEC publica coeficientes regionales que permitirían comparar mejor entre trabajadores de distintas zonas. Ya existe `data/diccionarios_eph/canastas_reg_example.csv` con la estructura.
 
-### 5. Evaluar factores ordenados para variables categóricas
+### 4. Evaluar factores ordenados para variables categóricas
 `Tramo_Edad` y `Nivel_Ed` tienen orden natural. Convertirlas a factor ordenado garantiza que los gráficos y tablas siempre las muestren en el orden correcto sin depender de `fct_reorder()`. Decisión pendiente del grupo.
 
-### 6. Agregar nota metodológica sobre brecha de género en sectores con baja participación femenina
+### 5. Agregar nota metodológica sobre brecha de género en sectores con baja participación femenina
+=======
+### 2. Incorporar CBT regional
+Actualmente se usa la CBT nacional promediada por trimestre. INDEC publica coeficientes regionales que permitirían comparar mejor entre trabajadores de distintas zonas. Ya existe `data/diccionarios_eph/canastas_reg_example.csv` con la estructura.
+
+### 3. Evaluar factores ordenados para variables categóricas
+`Tramo_Edad` y `Nivel_Ed` tienen orden natural. Convertirlas a factor ordenado garantiza que los gráficos y tablas siempre las muestren en el orden correcto sin depender de `fct_reorder()`. Decisión pendiente del grupo.
+
+### 4. Agregar nota metodológica sobre brecha de género en sectores con baja participación femenina
+>>>>>>> b6ff66ce096da327009c66d7d743db7a93dd9738
 El caso Construcción mostró que la brecha puede estar distorsionada por sesgo de selección cuando el N femenino es muy bajo. Agregar advertencia en `decisiones_metodologicas.md`.
 
 ---
 
 ## Prioridad baja — para después del análisis central
 
-### 7. Armar `06_grafo.R`
-Visualización del grafo intersectorial con `ggraph`. Tres versiones: registrados, no registrados, total. Nodos = sectores, grosor de arista = cantidad de traspasos, color = Delta CBT promedio (verde = mejora, rojo = empeora).
-
-### 8. Análisis de robustez — excluir 2020-T2
+<<<<<<< HEAD
+### 6. Análisis de robustez — excluir 2020-T2
 Correr el análisis principal excluyendo el trimestre del ASPO para verificar que los resultados no están siendo afectados por ese período atípico.
 
-### 9. Regionalizar el análisis del grafo
-Producir versiones del grafo por región para identificar si los patrones de movilidad intersectorial difieren entre GBA, Pampeana, NOA, etc.
+### 7. Regionalizar el análisis del grafo
+=======
+### 5. Análisis de robustez — excluir 2020-T2
+Correr el análisis principal excluyendo el trimestre del ASPO para verificar que los resultados no están siendo afectados por ese período atípico.
+
+### 6. Regionalizar el análisis del grafo
+>>>>>>> b6ff66ce096da327009c66d7d743db7a93dd9738
+Producir versiones del grafo por región para identificar si los patrones de movilidad intersectorial difieren entre GBA, Pampeana, NOA, etc. (`06_grafo.R` admite filtrado por `Region` sin modificaciones mayores.)
 
 ---
 
@@ -50,3 +65,17 @@ Producir versiones del grafo por región para identificar si los patrones de mov
 - Clasificador sectorial: `clasificar_sector()` en `utils.R`
 - Identificación de panel: `CODUSU + NRO_HOGAR + COMPONENTE`
 - Tramos etarios: 16–25, 26–46, 47+
+- Umbral mínimo de flujo para el grafo: N ≥ 50 (heatmap complementario: N ≥ 30)
+- Layout del grafo: `"stress"` con `set.seed(42)`
+
+---
+
+## Completado ✅
+
+- `00_explorar_raw.R` — exploración inicial
+- `01_descargar_completo.R` — descarga EPH completa 2016–2025
+- `02_crear_muestra.R` — muestra estratificada para exploración rápida
+- `03_explorar_muestra.R` — análisis exploratorio descriptivo
+- `04_analisis_cbt.R` — ingreso en CBT, prima de registro, brechas de género
+- `05_traspasos.R` — detección de traspasos, Delta CBT, diagnóstico completo
+- `06_grafo.R` — grafo dirigido (completo, ganancia, pérdida, heatmap)
