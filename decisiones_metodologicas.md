@@ -108,34 +108,50 @@ De las 252 variables del cuestionario individual de la EPH, se retienen 15 que r
 
 ---
 
-## 8. Decisiones pendientes
+## 8. Antecedentes bibliográficos
 
-- **CBT regional vs nacional:** incorporar coeficientes regionales para mejorar comparabilidad entre regiones.
-- **Grupo de comparación (contrafactual):** definir contra qué se compara el Delta CBT del trabajador que se traspasó — la opción preferida es el trabajador de igual perfil (género, tramo etario, nivel educativo, región) que se mantuvo en el sector de origen.
-- **Factores vs character:** evaluar si conviene convertir variables categóricas con orden natural (`Tramo_Edad`, `Nivel_Ed`) a factor ordenado.
+Esta sección documenta los antecedentes en la literatura para las tres decisiones metodológicas centrales del proyecto: el uso de CBT como deflactor (sección 6), la construcción del panel a partir de la rotación de la EPH (sección 7), y el enfoque de "movilidad absoluta" que subyace al cálculo del Delta CBT.
+
+### 8.1 Deflactor: CBT vs. IPC
+
+**Tornarolli, L. y Conconi, A. (2007).** *Informalidad y Movilidad Laboral: Un Análisis Empírico para Argentina*. Documento de Trabajo N°59, CEDLAS-UNLP.
+
+Es el antecedente más directo en cuanto a panel EPH y movilidad intersectorial en Argentina, pero **no es un antecedente metodológico válido para la elección de deflactor**. Trabajan con datos nominales (1998-2006) porque su objeto de estudio son *ratios* entre categorías en el mismo momento del tiempo (brecha formal/informal) y *probabilidades de transición*, magnitudes en las que el nivel de precios se cancela. Nuestro proyecto, en cambio, mide el cambio de poder adquisitivo de un mismo individuo entre t y t+1 — una comparación intertemporal de una magnitud real, donde el deflactor es central y no cosmético.
+
+**Beccaria, L. y Groisman, F. (2006).** *Inestabilidad, Movilidad y Distribución del Ingreso en Argentina*. Revista de la CEPAL N°89, pp. 133-156.
+
+Sí enfrentan el mismo problema que nosotros (comparación intertemporal de ingresos reales individuales) y resuelven deflactando con IPC, expresando los valores en pesos constantes de un año base (2001). Su período de análisis (1988-2001) es anterior a la intervención del IPC del INDEC (2007-2016), por lo que el IPC era una fuente confiable en su momento. Para nuestro período (2016-2025) esa condición no se cumple: aunque el IPC fue reconstruido desde 2016, persiste la discusión sobre series comparables hacia atrás. La CBT, publicada con metodología post-2016 y de forma regionalizada, evita ese problema y además tiene una interpretación más directa para nuestra pregunta de investigación (poder de compra respecto a una canasta de subsistencia, no inflación general).
+
+**Conclusión:** nuestro uso de CBT replica la *lógica* de B&G (deflactar para obtener una magnitud real comparable entre dos momentos) pero resuelve el problema de la fuente de precios de manera distinta, justificada por las particularidades de nuestro período de análisis.
+
+### 8.2 Construcción del panel a partir de la rotación de la EPH
+
+Beccaria y Groisman (2006) describen la lógica general que después implementamos en `05_traspasos.R`: la EPH no es longitudinal por diseño, pero su esquema de rotación (4 ondas, 75% de solapamiento entre ondas consecutivas) permite construir paneles cortos siguiendo al mismo individuo.
+
+Una diferencia relevante: B&G intentan seguir hogares durante **4 ondas** (un año y medio), lo cual les genera un problema de tamaño de muestra que resuelven "mancomunando" sub-paneles que arrancan en trimestres distintos — un parche que ellos mismos reconocen puede introducir sesgos no investigados. Nuestro enfoque —transiciones entre **dos ondas consecutivas** (t, t+1), repetidas a lo largo de toda la serie 2016-2025— no requiere ese parche: el panel se construye de forma natural y acumulativa sin forzar una ventana de 4 ondas.
+
+**Limitación compartida (attrition):** B&G señalan que la pérdida de casos entre ondas (attrition) puede introducir sesgo de selección no corregido por los ponderadores transversales de la EPH. Esta es la misma limitación que ya tenemos documentada respecto a `PONDERA_t` (ver sección "Decisiones pendientes" y `hallazgos.md`): los pesos cross-sectional no necesariamente corrigen la subrepresentación de quienes abandonan el panel longitudinal. Es una limitación reconocida en la literatura desde al menos 2006, no un descuido propio — vale la pena citarla así en la presentación.
+
+### 8.3 Marco conceptual del Delta CBT: movilidad absoluta vs. relativa
+
+B&G (Sección III.1, "La movilidad de ingresos", pp. 137-138) distinguen dos enfoques en la literatura sobre dinámica de ingresos:
+
+- **Movilidad relativa (de orden):** cambios en la posición que un individuo/hogar ocupa en la distribución de ingresos (ej. cambio de quintil).
+- **Movilidad absoluta:** la dirección y magnitud del cambio en el ingreso, independientemente de si hay cambio de posición relativa. Citan la formulación de Fields (2004):
+
+  Ω* = (1/n) Σᵢ (y₂ᵢ − y₁ᵢ) / y₁ᵢ
+
+  un promedio de cambios porcentuales individuales, que incorpora el signo del cambio.
+
+**Nuestro Delta CBT (Delta CBT = CBT_consumidas_{t+1} − CBT_consumidas_t, promediado por par origen→destino) es una instancia directa de movilidad absoluta**, conceptualmente más cercana a la formulación teórica Ω* de Fields que a lo que B&G terminan implementando en la práctica (que es un análisis de trayectorias entre quintiles de hogares, Cuadro 7, más correlaciones de Pearson/Spearman entre ingresos de distintos períodos — es decir, movilidad relativa, no absoluta).
+
+**Implicancia para la presentación:** esto permite encuadrar el proyecto explícitamente dentro de la tradición de "movilidad absoluta de ingresos" (Fields 2004; Beccaria y Groisman 2006), con dos contribuciones respecto a esos antecedentes: (1) resolución del problema del deflactor para un período (2016-2025) no cubierto por la literatura citada, y (2) implementación más directa del concepto teórico de movilidad absoluta — calculado por categoría de transición sectorial en lugar de por grupo demográfico fijo, y visualizado como grafo dirigido (próximo paso, `06_grafo.R`).
 
 ---
 
-## 9. Diseño del grafo intersectorial (`06_grafo.R`)
+## 9. Decisiones pendientes
 
-**Decisiones de representación:**
-
-| Elemento visual | Variable codificada | Justificación |
-|---|---|---|
-| Dirección de la flecha | Sentido del traspaso (origen → destino) | Permite leer asimetría de los flujos |
-| Grosor de arista | N de traspasos (rescalado 0.3–3.5) | Volumen = relevancia empírica del flujo |
-| Color de arista | Delta CBT medio (divergente rojo–blanco–verde, centrado en 0) | Variable central del análisis |
-| Tamaño de nodo | N total de traspasos que involucran al sector (entrada + salida) | Centralidad en la red de movilidad, no empleo total |
-| Color de nodo | Paleta de proyecto (`colores_sectores` en `utils.R`) | Consistencia visual con el resto del proyecto |
-
-**Umbral de flujo:** se incluyen solo flujos con N ≥ 50 en el grafo de red. Flujos con N < 50 tienen estimaciones de Delta CBT poco estables. El heatmap complementario usa N ≥ 30 para mostrar más flujos en formato tabular.
-
-**Layout:** `"stress"` (Fruchterman-Reingold mejorado de `{graphlayouts}`) con `set.seed(42)` para reproducibilidad.
-
-**`geom_edge_arc()`** con `strength = 0.25` para separar visualmente flujos bidireccionales (ej. Adm. Pública ↔ Otros Servicios, que son los flujos más voluminosos).
-
-**Cuatro visualizaciones producidas:**
-- `06_01_grafo_completo.png` — todos los flujos con N ≥ 50
-- `06_02_grafo_ganancia.png` — solo flujos con Delta CBT > 0
-- `06_03_grafo_perdida.png` — solo flujos con Delta CBT ≤ 0
-- `06_04_heatmap_flujos.png` — heatmap de todos los flujos con N ≥ 30 (complemento tabular)
+- **CBT regional vs nacional:** incorporar coeficientes regionales para mejorar comparabilidad entre regiones.
+- **Grupo de comparación (contrafactual):** definir contra qué se compara el Delta CBT del trabajador que se traspasó — la opción preferida es el trabajador de igual perfil (género, tramo etario, nivel educativo, región) que se mantuvo en el sector de origen.
+- **Categoría "Servicios Profesionales e IT":** pendiente de validación con el grupo antes de fijarla en el clasificador definitivo.
+- **Factores vs character:** evaluar si conviene convertir variables categóricas con orden natural (`Tramo_Edad`, `Nivel_Ed`) a factor ordenado.
