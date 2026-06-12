@@ -4,4 +4,7 @@
 .Ruserdata
 .positai
 # Datos pesados - excluidos del repositorio
-data/
+data/*
+
+# Excepciones: archivos livianos que sí se versionan
+!data/serie_ipc_divisiones.csv
